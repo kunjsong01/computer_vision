@@ -1,19 +1,19 @@
 pkg load image;
 img = imread("/Users/kunjian_song/Downloads/schnauzer.jpg");
 
-# add Gaussian noise
+% add Gaussian noise
 noise_sigma = 100; # noise intensity. This sigma is NOT kernel sigma used by filtering
 noise = randn(size(img)) .* noise_sigma;
 noisy_img = img + noise;
 
-# create gaussian filter
-hsize = 31; # size of the kernel 31 x 31
-sigma = 5; # bigger sigma, more blurry
-sigma_big = 20; # bigger sigma, more blurry
+% create gaussian filter
+hsize = 31; % size of the kernel 31 x 31
+sigma = 5; % bigger sigma, more blurry
+sigma_big = 20; % bigger sigma, more blurry
 h = fspecial("gaussian", hsize, sigma);
 h2 = fspecial("gaussian", hsize, sigma_big);
 
-# apply the filter to remove noise
+% apply the filter to remove noise
 smoothed_noisy = imfilter(noisy_img, h);
 smoothed_clean_small_sig = imfilter(img, h);
 smoothed_clean_big_sig = imfilter(img, h2);
