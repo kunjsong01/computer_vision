@@ -29,11 +29,13 @@ disp_image(X_prime, 4, 'subtract result form the original image');
 
 % get histogram
 % roihist()
-% try threshold of -10, -40 (by inspecting the histogram of X_prime)
+% try threshold of -10, -30, -50 (by inspecting the histogram of X_prime)
 binarized2 = (X_prime > -10);
 disp_image(binarized2, 5, 'thresholds of x > -10');
-binarized3 = (X_prime > -50);
-disp_image(binarized3, 6, 'thresholds of x > -50');
+binarized3 = (X_prime > -30);
+disp_image(binarized3, 6, 'thresholds of x > -30');
+binarized4 = (X_prime > -50);
+disp_image(binarized4, 7, 'thresholds of x > -50');
 
 
 
