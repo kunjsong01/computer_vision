@@ -1,4 +1,4 @@
-function [level, em] = otsu_fig(I)
+function [level, em] = graythresh_modified(I)
 %GRAYTHRESH Global image threshold using Otsu's method.
 %   LEVEL = GRAYTHRESH(I) computes a global threshold (LEVEL) that can be
 %   used to convert an intensity image to a binary image with IMBINARIZE.
@@ -54,10 +54,10 @@ else
   em = 0;
 end
 
-figure
-imhist(I);
-hold on
-plot([level*max(I(:)) level*max(I(:))], [0 5000], 'r')
+%figure
+%imhist(I);
+%hold on
+%plot([level*max(I(:)) level*max(I(:))], [0 5000], 'r')
 
-disp(['Otsu method Threshold = ', num2str(round(level*255))]);
+disp(['Otsu method Threshold = ', num2str(round(level))]);
 

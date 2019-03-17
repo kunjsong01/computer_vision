@@ -12,28 +12,16 @@ clf
 close all
 % ----------------------- Step 1 ----------------------- 
 X = pgmread('task1.pgm');
-figure(1)
-I = imagesc(X);
-colormap(gray);
-axis image;
-colorbar
+disp_image(X, 1, 'original img')
 
 % ----------------------- Step 2 ----------------------- 
 x = getimage(gcf);
 bw = drawpolygon();
 mask = createMask(bw);
-figure(2)
-I2 = imagesc(mask);
-colormap(gray);
-axis image;
-colorbar
+disp_image(mask, 2, 'image mask')
 % create a new image using ROI and dark background
 ROI_I = X.*mask;
-figure(3)
-I3 = imagesc(ROI_I);
-colormap(gray);
-axis image;
-colorbar
+disp_image(ROI_I, 3, 'masked image - ROI + black out')
 % plot histogram of the the new image (only non-zero minimum) 
 figure(4)
 flat = ROI_I(:);
@@ -41,39 +29,13 @@ non_zero = flat(flat>0);
 i = min(non_zero) : (max(non_zero)- min(non_zero))/64.0 : max(non_zero);
 h = hist(non_zero,i);
 bar(i, h);
-title('');
+title('histogram of the masked image (Non-zero values only)');
 
 % ----------------------- Step 3 ----------------------- 
 % try with thresholds of 180 < I < 220
 binarized1 = (ROI_I > 180) & (ROI_I < 220);
-figure(5)
-I4 = imagesc(binarized);
-colormap(gray);
-axis image;
-colorbar
-title('thresholds of 180 < I < 220')
+disp_image(binarized1, 5, 'thresholds of 180 < I < 220')
 
 binarized2 = (ROI_I > 200) & (ROI_I < 215);
-figure(6)
-I5= imagesc(binarized2);
-colormap(gray);
-axis image;
-colorbar
-title('thresholds of 200 < I < 215')
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+disp_image(binarized2, 6, 'thresholds of 200 < I < 215')
 
