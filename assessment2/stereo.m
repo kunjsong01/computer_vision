@@ -5,8 +5,8 @@
 % Each row in the image is the corresponding epipolar line in the other.
 % The suffix is misleading. They are NOT pgm images. 
 % -----------------------------------------------------------
-left_image = imread('shaft3rec.l.pgm');
-right_image = imread('shaft3rec.r.pgm');
+left_image = imread('left.pgm');
+right_image = imread('right.pgm');
 
 % Find the edges ( like this for instance, but however you like)
 % -------------------------------------------------------------
