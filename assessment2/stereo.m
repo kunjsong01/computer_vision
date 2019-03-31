@@ -1,3 +1,4 @@
+close all
 
 % Load images
 % Note that images are already rectified from calibrated camera, i.e.
@@ -10,8 +11,10 @@ right_image = imread('right.pgm');
 
 % Find the edges ( like this for instance, but however you like)
 % -------------------------------------------------------------
-left_edge_image = edge(left_image,'sobel');
-right_edge_image = edge(right_image,'sobel');
+%s = 'sobel';
+s = 'Canny';
+left_edge_image = edge(left_image, s);
+right_edge_image = edge(right_image, s);
 
 % Display everything
 % ------------------
@@ -28,12 +31,13 @@ title('Right Image');
 subplot(2,2,3);
 imagesc(left_edge_image);
 axis image, axis off, colormap gray;
-title('Left Edge Image');
+L_edge_title = sprintf('Left Edge Image - detector %s', s);
+title(L_edge_title);
 subplot(2,2,4);
 imagesc(right_edge_image);
 axis image, axis off, colormap gray;
-title('Right Edge Image');
-
+R_edge_title = sprintf('Left Edge Image - detector %s', s);
+title(R_edge_title);
 
 % Now do the matching ( a basic understanding of Matlab is needed here )
 % disparity matrix concatenation - i.e. append [left_coords, disparities] to
@@ -41,15 +45,15 @@ title('Right Edge Image');
 % -----------------------------------------------------------------------
 num_rows = size(left_image,1);
 num_cols = size(right_image,2);
-array_of_disparities2 = []; 
+array_of_disparities = []; 
 best_disparity = [];
-
+L = 0;
 for r = 1:num_rows
 	left_edge_pixels = find(left_edge_image(r,:));
     if left_edge_pixels ~= 0
-        s = sprintf('edge points found in row %d', r);
+        debug_s = sprintf('edge points found in row %d', r);
         % debug info to make sure window size does not exceed img boundary
-        disp(s);
+        disp(debug_s);
     end
     % process each edge point in Left image
 	for i = left_edge_pixels
@@ -104,7 +108,7 @@ for r = 1:num_rows
 		left_coords = repmat([i,r],num_matches,1);
         % incorporate sum of absolute difference in the array
         left_coords = [left_coords, SAD_vector'];
-		array_of_disparities2 = [array_of_disparities2; [left_coords, disparities]];
+		array_of_disparities = [array_of_disparities; [left_coords, disparities]];
         
         % select best disparities based on correspondence level for each
         % edge point
@@ -116,12 +120,35 @@ for r = 1:num_rows
         assert(size(disparities, 1) == size(SAD_column, 1));
         average_min_disparity = round(mean(disparities(SAD_min_idx')));
         best_disparity = [best_disparity; [i, r, SAD_min, average_min_disparity]];
-	end
+    end 
 end
 
-% Display the table of candidate matches
+% edge points depth calculation
+% Z = 1/(k+disparity) where k is an arbitary constant
 % --------------------------------------
-array_of_disparities2;
+object_edge = best_disparity(:, 1:2);
+k = 1; % change k to find best reconstruction
+tmp_depth = [];
+disparity_column = best_disparity(:, 4:4);
+for i = drange(1, size(disparity_column,1))
+    depth = 1 / (k + disparity_column(i));
+    tmp_depth = [tmp_depth, depth];
+end
+assert(size(tmp_depth, 2) == size(object_edge, 1));
+object_edge = [object_edge, tmp_depth'];
+
+
+% 3D reconstruction using edge points with depth in scatter plot
+% need to apply real world depth using focal length
+% --------------------------------------
+world_depth = object_edge(:, 3).*(17/(0.11/2));
+object_edge = [object_edge, world_depth];
+figure(2);
+plot3(object_edge(:, 1), object_edge(:, 2), object_edge(:,4), '.', 'MarkerSize', 5)
+recon_title = sprintf('reconstructed 3D object - correspondence using %s for edge detection and window size %d', s, L);
+title(recon_title)
+axis equal
+
 
 
 
