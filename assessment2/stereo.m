@@ -42,7 +42,7 @@ title('Right Edge Image');
 num_rows = size(left_image,1);
 num_cols = size(right_image,2);
 array_of_disparities2 = []; 
-disparity_array_after_SAD = [];
+best_disparity = [];
 
 for r = 1:num_rows
 	left_edge_pixels = find(left_edge_image(r,:));
@@ -104,7 +104,18 @@ for r = 1:num_rows
 		left_coords = repmat([i,r],num_matches,1);
         % incorporate sum of absolute difference in the array
         left_coords = [left_coords, SAD_vector'];
-		array_of_disparities2 = [array_of_disparities2; [left_coords, disparities]];        
+		array_of_disparities2 = [array_of_disparities2; [left_coords, disparities]];
+        
+        % select best disparities based on correspondence level for each
+        % edge point
+        SAD_column = left_coords(:, 3:3);
+        SAD_min = min(SAD_column(:)');
+        SAD_min_idx = find(SAD_column == SAD_min);
+        disp(SAD_min_idx');
+        % assert disparity and SAD vector boundary before calc
+        assert(size(disparities, 1) == size(SAD_column, 1));
+        average_min_disparity = round(mean(disparities(SAD_min_idx')));
+        best_disparity = [best_disparity; [i, r, SAD_min, average_min_disparity]];
 	end
 end
 
