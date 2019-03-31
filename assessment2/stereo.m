@@ -45,7 +45,8 @@ title(R_edge_title);
 % -----------------------------------------------------------------------
 num_rows = size(left_image,1);
 num_cols = size(right_image,2);
-array_of_disparities = []; 
+array_of_disparities = [];
+new_array_of_disparities = [];
 best_disparity = [];
 L = 0;
 for r = 1:num_rows
@@ -71,8 +72,8 @@ for r = 1:num_rows
         % use a 3x3 window to calculate SAD in the right image
         % This is to find the correspondence between the left and right
         % edge points
-        % L: for a 5x5 window, this is the distance from window edge to
-        % the centre. Assuming square window
+        % L: this is the distance from window edge to the centre. Assuming square window
+        %    e.g. L = 2 for a 5x5 window, 
         L = 3; % if using 2, too many minimal SAD values
         left_window = [];
         % construct left window
@@ -91,7 +92,15 @@ for r = 1:num_rows
             for k2 = drange(r-L, r+L)
                 tmp_row = [];
                 for k3 = drange(j2-L, j2+L)
-                    tmp_row = [tmp_row, right_image(k2, k3)];
+                    % check out of boundary cases and copy and extend the boundaries if exceed
+                    x = k3;
+                    if k3 < 1
+                        x = 1;
+                    end
+                    if k3 > size(right_image, 2)
+                        x = size(right_image, 2);
+                    end
+                    tmp_row = [tmp_row, right_image(k2, x)];
                 end
                 right_window = [right_window; tmp_row];
             end
@@ -106,9 +115,10 @@ for r = 1:num_rows
         
         % copy [i, r] repeatedly in num_matches rows and 1 column
 		left_coords = repmat([i,r],num_matches,1);
+		array_of_disparities = [array_of_disparities; [left_coords, disparities]];
         % incorporate sum of absolute difference in the array
         left_coords = [left_coords, SAD_vector'];
-		array_of_disparities = [array_of_disparities; [left_coords, disparities]];
+        new_array_of_disparities = [new_array_of_disparities; [left_coords, disparities]];
         
         % select best disparities based on correspondence level for each
         % edge point
